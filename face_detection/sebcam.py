@@ -1,11 +1,12 @@
 import cv2
-import Face
+#import Face
 
 def detectface(c_frame, window=False):
     # 定数定義
     ORG_WINDOW_NAME = "org"
     GAUSSIAN_WINDOW_NAME = "gaussian"
 
+#    face = Face()
 
     # 分類器の指定
     cascade_file = "haarcascade_frontalface_alt2.xml"
@@ -29,13 +30,16 @@ def detectface(c_frame, window=False):
         color = (0, 0, 225)
         pen_w = 3
         cv2.rectangle(img_gray, (x, y), (x+w, y+h), color, thickness = pen_w)
-        print( str(w) +','+ str(h))
+        #print( str(w) +','+ str(h))
 
     # フレーム表示
     if window:
         cv2.imshow(ORG_WINDOW_NAME, c_frame)
         cv2.imshow(GAUSSIAN_WINDOW_NAME, img_gray)
+    
+    
 
+    return len(face_list), face_list 
 
 if __name__ == '__main__':
     # 定数定義
@@ -47,11 +51,13 @@ if __name__ == '__main__':
     cap = cv2.VideoCapture(DEVICE_ID)
 
     # 初期フレームの読込
-    end_flag, c_frame = cap.read()
+    end_flag, frame = cap.read()
 
     # 変換処理ループ
     while end_flag == True:
-        detectface(c_frame)
+        length, faces = detectface(frame, window=True)
+        print(length)
+        print(faces)
 
         # Escキーで終了
         key = cv2.waitKey(INTERVAL)
@@ -59,7 +65,7 @@ if __name__ == '__main__':
                 break
 
         # 次のフレーム読み込み
-        end_flag, c_frame = cap.read()
+        end_flag, frame = cap.read()
 
     # 終了処理
     cv2.destroyAllWindows()
