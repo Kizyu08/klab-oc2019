@@ -19,10 +19,5 @@ class Faces:
     def set_face(self, newface):
         self.__faces.append(newface)
 
-
-#usage
-unkoface=Face(1,[(1,2),(3,4)])
-unkoface.set_result(1,1,1,1,1,1,1,1,1)
-img=cv2.imread("IMG_0005.png",1)
-aaa=Faces(img)
-aaa.set_face(unkoface)
+    def face(self):
+        return self.__faces

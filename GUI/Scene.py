@@ -12,6 +12,7 @@ import random
 
 sys.path.append('../face')
 import face
+import faces
 import IScene
 import Util
 import Window
@@ -33,7 +34,6 @@ class Scene(IScene.IScene):
         self.__pathOfemotionImageListFile   = "./frame/emotionImageList.txt" # 
         self.__pathInitSceneFile            = "./init/scene.info"
         self.__clock = pygame.time.Clock()
-        self.__faces = {}
         self.__emotionNames = []                # 表情の名称を格納するリスト
         self.__emotionImages = {}               # 表情の名称に対応する画像を格納する辞書型リスト
 
@@ -65,7 +65,9 @@ class Scene(IScene.IScene):
             self.__isDrawLargeFrame = int((sceneInfo.readline()).rstrip("\n"))
             self.__isDrawFaceFrames = int((sceneInfo.readline()).rstrip("\n"))
             self.__isDrawDetectedRegions = int((sceneInfo.readline()).rstrip("\n"))
-                
+
+        self.__faces = faces.Faces(self.__captureImage)                  # 顔リストクラスの初期化を行う
+        
 
     # 更新処理のメインとなるメソッド
     def update(self):
@@ -115,8 +117,8 @@ class Scene(IScene.IScene):
 # 描画(__draw)関連のメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # 検出箇所を描画するメソッド
     def __drawDetectedRegions(self):
-        for face in self.__faces:
-            rect = face.rect()
+        for aface in self.__faces.face():
+            rect = aface.rect()
             (x, y), (w, h) = rect
             #print(str(str(x)) + " " + str(str(y)) + " " + str(str(w)) + " " + str(str(h)) + " ")
             rectPygame = pygame.Rect(x, y, w, h)
@@ -126,11 +128,12 @@ class Scene(IScene.IScene):
     # 各顔を表情スコアが最大となる表情のフレームで囲うようにフレームを描画するメソッド
     def __drawFrameByFaces(self):
         resizedFrames = []
-        for face in self.__faces:
+        facelist = self.__faces.face()
+        for aface in facelist:
             likelyEmotionName   = None
             maxScore            = -1
-            emotionScores = face.result()
-            rect = face.rect()
+            emotionScores = aface.result()
+            rect = aface.rect()
             (x, y), (w, h) = rect
             for emotionName in emotionScores.keys():
                 score = emotionScores[emotionName]
@@ -251,7 +254,8 @@ class Scene(IScene.IScene):
         self.__faces = self.__computeFaceScores(self.__faces)
 
         # スコア別に合計を求める
-        for aface in self.__faces:
+        faceList = self.__faces.face()
+        for aface in faceList:
             emotionScores = aface.result()
             for emotionName in emotionScores.keys():
                 emotionSumScores[emotionName] += emotionScores[emotionName]
@@ -280,14 +284,15 @@ class Scene(IScene.IScene):
 
     # 検出された顔の表情スコアを求めるメソッド
     # 実装は他の人が行うので担当外
-    def __computeFaceScores(self, faces):
+    def __computeFaceScores(self, facesObj):
         maxSizeFace = face.Face()
+        faceList = facesObj.face()
         (x, y), (w, h) = maxSizeFace.rect()
-        for aface in faces:
+        for aface in faceList:
             (cx, cy), (cw, ch) = aface.rect()
             if cw > w:
                 w = cw
-        for aface in faces:
+        for aface in faceList:
             (x, y), (w, h) = aface.rect()
             #print(face.rect())
             cnt = 0
@@ -299,7 +304,7 @@ class Scene(IScene.IScene):
                 else:
                     emotionScores[emotionName] = 0
                 cnt += 1
-        return faces
+        return facesObj
 
     # 画面の内容を画像として保存する
     def __saveImage(self):

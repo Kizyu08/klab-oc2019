@@ -4,6 +4,7 @@ import sys
 
 sys.path.append('../face')
 import face
+import faces
 
 def faceDetectionDummy(img):
    
@@ -15,17 +16,17 @@ def faceDetectionDummy(img):
     
     # 顔領域の探索
     aface = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
-    faces = []
+    facesData = faces.Faces(img)
     cnt = 0
     # 顔領域を赤色の矩形で囲む
     for (x, y, w, h) in aface:
         faceData = face.Face(cnt, [(x, y), (w, h)])
 #        faceData.__rect = [(x,y), (w,h)]
         faceData.__face__id = cnt
-        faces.append(faceData)
+        facesData.set_face(faceData)
         cnt += 1
         print(faceData.rect())
         #print(str(faceData.x) + "," + str(faceData.y) + " ... " + str(w) + "x" + str(h))
     #for f in faces:
     #    print(str(f.x) + " " + str(f.y) + " " + str(f.width) + " " + str(f.id))
-    return faces
+    return facesData
