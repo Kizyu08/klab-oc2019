@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import datetime
 import random
 
-sys.path.append('./Face')
-import Face
+sys.path.append('../face')
+import face
 import IScene
 import Util
 import Window
@@ -105,7 +105,7 @@ class Scene(IScene.IScene):
     # 各表情の名称を格納したリストを取得するメソッド
     # face クラスから各名称を取得する
     def __initEmotionNames(self):
-        tempFace = Face.Face()
+        tempFace = face.Face()
         emotionScores = tempFace.result()
         for emotionName in emotionScores.keys():
             self.__emotionNames.append(emotionName)
@@ -233,8 +233,9 @@ class Scene(IScene.IScene):
 
     # 顔リストに格納された表情スコアを元に画面へ表示するフレームを選択するメソッド
     def __selectDrawFrameByFaces(self):
-        # 表情スコア計算用の辞書型リストを取得する
-        emotionSumScores = Face.Face().result()
+        # 表情スコア計算用の
+        # 辞書型リストを取得する
+        emotionSumScores = face.Face().result()
 
         # 念の為、初期化する
         for emotionName in emotionSumScores.keys():
@@ -250,8 +251,8 @@ class Scene(IScene.IScene):
         self.__faces = self.__computeFaceScores(self.__faces)
 
         # スコア別に合計を求める
-        for face in self.__faces:
-            emotionScores = face.result()
+        for aface in self.__faces:
+            emotionScores = aface.result()
             for emotionName in emotionScores.keys():
                 emotionSumScores[emotionName] += emotionScores[emotionName]
                 #print("!" + str(face.emotionScores[emotionName]) + "!")
@@ -280,18 +281,18 @@ class Scene(IScene.IScene):
     # 検出された顔の表情スコアを求めるメソッド
     # 実装は他の人が行うので担当外
     def __computeFaceScores(self, faces):
-        maxSizeFace = Face.Face()
+        maxSizeFace = face.Face()
         (x, y), (w, h) = maxSizeFace.rect()
-        for face in faces:
-            (cx, cy), (cw, ch) = face.rect()
+        for aface in faces:
+            (cx, cy), (cw, ch) = aface.rect()
             if cw > w:
                 w = cw
-        for face in faces:
-            (x, y), (w, h) = face.rect()
+        for aface in faces:
+            (x, y), (w, h) = aface.rect()
             #print(face.rect())
             cnt = 0
             pos = int(w / 25) % len(self.__emotionNames)
-            emotionScores = face.result()
+            emotionScores = aface.result()
             for emotionName in emotionScores.keys():
                 if cnt == pos:
                     emotionScores[emotionName] = 1.0
