@@ -1,0 +1,8 @@
+neutral h.png
+angry f.png
+happiness d.png
+unlucky b.png
+sad e.png
+grad a.png
+pleasant c.png
+enjoy g.png
