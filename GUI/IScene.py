@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 class SceneID:
-    NONE    = 0
-    MAIN    = 1
+    NONE                = 0
+    PROTOTYPE_SCENE    = 1
+    
 
 class IScene(object):
     def __init__(self, window):

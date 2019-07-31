@@ -24,12 +24,12 @@ import EmotionImages
 # シーンクラス
 # 画面内の処理を行う
 # （顔の検出やスコアの計算、カメラからの映像やフレームの描画、等）
-class Scene(IScene.IScene):
+class PrototypeScene(IScene.IScene):
     # コンストラクタ
     def __init__(self, window):
         # メンバ変数の初期化 ---------------------------------------------------
-        super(Scene, self).__init__(window)
-        self.__sceneID = IScene.SceneID.MAIN
+        super(PrototypeScene, self).__init__(window)
+        self.__sceneID = IScene.SceneID.PROTOTYPE_SCENE
 
         self.__dirPathOfEmotionImages       = "./frame"                      # フレーム画像が存在するディレクトリのパス
         self.__pathOfemotionImageListFile   = "./frame/emotionImageList.txt" # 

@@ -12,7 +12,8 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import datetime
-import Scene
+import PrototypeScene
+import IScene
 import MakeScene
 
 class OCGUI:
@@ -24,7 +25,8 @@ class OCGUI:
         # ウィンドウの初期設定を行う
         self.__initWindow()
         # シーンを作成する
-        self.__scene = Scene.Scene(self.__window)
+        self.__scene = MakeScene.makeScene(IScene.SceneID.PROTOTYPE_SCENE, self.__window)
+        #Scene.Scene(self.__window)
 
 
     # 描画処理を行うメソッド
