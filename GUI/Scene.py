@@ -18,6 +18,7 @@ import Util
 import Window
 import SceneEventID
 import FaceDetectionDummy
+import EmotionImages
 
 
 # シーンクラス
@@ -35,7 +36,7 @@ class Scene(IScene.IScene):
         self.__pathInitSceneFile            = "./init/scene.info"
         self.__clock = pygame.time.Clock()
         self.__emotionNames = []                # 表情の名称を格納するリスト
-        self.__emotionImages = {}               # 表情の名称に対応する画像を格納する辞書型リスト
+        #self.__emotionImages = {}               # 表情の名称に対応する画像を格納する辞書型リスト
 
         self.__captureImage          = None     # カメラからキャプチャーした画像
         self.__captureImageForPygame = None     # カメラからキャプチャーした画像をpygame用に変換したもの
@@ -47,9 +48,7 @@ class Scene(IScene.IScene):
         self.__isExitFlag = False               # シーン終了フラグをOFFにする
         self.__sceneEventId = SceneEventID.SceneEventID()    # シーンイベントを初期化する
         self.__initEmotionNames()               # 表情の名称を取得する
-        self.__readImageFiles()                 # 表情に対応したフレームを取得する
         self.__window.setFontSize(20)           # フォントサイズを設定する
-
 
         sceneInfo = open(self.__pathInitSceneFile , "r")
         if sceneInfo == None:
@@ -67,7 +66,12 @@ class Scene(IScene.IScene):
             self.__isDrawDetectedRegions = int((sceneInfo.readline()).rstrip("\n"))
 
         self.__faces = faces.Faces(self.__captureImage)                  # 顔リストクラスの初期化を行う
-        
+        self.__emotionImagesObj = EmotionImages.EmotionImages(
+            self.__pathOfemotionImageListFile,
+            self.__window.getWidth(),
+            self.__window.getHeight()
+        )
+
 
     # 更新処理のメインとなるメソッド
     def update(self):
@@ -120,7 +124,6 @@ class Scene(IScene.IScene):
         for aface in self.__faces.face():
             rect = aface.rect()
             (x, y), (w, h) = rect
-            #print(str(str(x)) + " " + str(str(y)) + " " + str(str(w)) + " " + str(str(h)) + " ")
             rectPygame = pygame.Rect(x, y, w, h)
             rgb = (0, 255, 0)
             self.__window.drawRect(rgb, rectPygame, 2)
@@ -129,6 +132,7 @@ class Scene(IScene.IScene):
     def __drawFrameByFaces(self):
         resizedFrames = []
         facelist = self.__faces.face()
+        frameImage = None
         for aface in facelist:
             likelyEmotionName   = None
             maxScore            = -1
@@ -140,11 +144,9 @@ class Scene(IScene.IScene):
                 if score > maxScore:
                     maxScore = score
                     likelyEmotionName = emotionName
-            frameImage = pygame.transform.scale(
-                self.__emotionImages[likelyEmotionName],
-                (w, h)
-            )
-            self.__window.drawImg(frameImage, x, y)
+            frameImage = self.__emotionImagesObj.getEmotionImage(likelyEmotionName, w, h)
+            if frameImage:
+                self.__window.drawImg(frameImage, x, y)
 
 
     # カメラから読み込んだ画像を描画するメソッド
@@ -158,7 +160,10 @@ class Scene(IScene.IScene):
         if self.__curlikelyEmotionName == None:
             return
         if self.__curlikelyEmotionName in self.__emotionNames:
-            self.__window.drawImg(self.__emotionImages[self.__curlikelyEmotionName], 0, 0)
+            self.__window.drawImg(
+                self.__emotionImagesObj.getEmotionImage(self.__curlikelyEmotionName),
+                0, 0
+            )
         else:
             print("\"Face\" クラスに存在しない表情名" + "\"" + self.__curlikelyEmotionName + "\"が尤もらしい表情として指定されました．")
 
@@ -173,37 +178,6 @@ class Scene(IScene.IScene):
             size = self.__window.getHeight(), self.__window.getWidth(), 3
             contours = np.array( [ [0,0], [0,size[1]], [size[0], size[1]], [size[0],0] ] )
             dummy = np.zeros(size, dtype=np.uint8)
-
-    # 画像ファイルを読み込むメソッド
-    def __readImageFiles(self):
-        self.__readFrameImgFiles()  # フレーム画像を読み込む
-
-    # 表情の名称とペアな画像を読み込むメソッド
-    # 読み込みには "./frame/emotionsList.txt" を利用する
-    def __readFrameImgFiles(self):
-        emotionImageListFile = open(self.__pathOfemotionImageListFile, 'r')
-        emotionImageList = []
-        wndWidth = self.__window.getWidth()
-        wndHeight = self.__window.getHeight()
-        while True:
-            line = emotionImageListFile.readline()
-            if not line:
-                break
-            line.strip("\n")
-            pair = line.split()
-            if len(pair) < 2:
-                continue
-            #print(pair)
-            self.__emotionImages[pair[0]] = pygame.image.load(self.__dirPathOfEmotionImages + "/" + pair[1])
-            imgRect = self.__emotionImages[pair[0]].get_rect()
-            imgWidth = imgRect.width
-            imgHeight = imgRect.height
-            widthRate = float(wndWidth) / float(imgWidth)
-            heightRate = float(wndHeight) / float(imgHeight)
-            self.__emotionImages[pair[0]] = pygame.transform.scale(
-                    self.__emotionImages[pair[0]], (wndWidth, wndHeight)
-            )
-
 
 # 更新(__update)関連のメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # シーンの現在行うべきイベントを確認する
@@ -259,7 +233,6 @@ class Scene(IScene.IScene):
             emotionScores = aface.result()
             for emotionName in emotionScores.keys():
                 emotionSumScores[emotionName] += emotionScores[emotionName]
-                #print("!" + str(face.emotionScores[emotionName]) + "!")
         
         # スコアの合計が最大である表情の名称とそのスコアを取得する
         self.__maxScore = -1                # 最大スコア
@@ -278,8 +251,6 @@ class Scene(IScene.IScene):
     # 仮実装として顔の検出数や位置等は乱数
     def __detectFaces(self):
         faces = FaceDetectionDummy.faceDetectionDummy(self.__captureImage)
-        #for f in faces:
-        #    print(">>>>>" + str(f.x) + " " + str(f.y) + " " + str(f.width) + " " + str(f.id))
         return faces
 
     # 検出された顔の表情スコアを求めるメソッド
@@ -294,7 +265,6 @@ class Scene(IScene.IScene):
                 w = cw
         for aface in faceList:
             (x, y), (w, h) = aface.rect()
-            #print(face.rect())
             cnt = 0
             pos = int(w / 25) % len(self.__emotionNames)
             emotionScores = aface.result()

@@ -22,22 +22,55 @@ import FaceDetectionDummy
 # 画像は GUI 周りを管理している Pygame の形式で管理する
 class EmotionImages:
     # コンストラクタ
-    def __init__(self, pathOfEmotionImagesList = "./frame/emotionImagesList.txt"):
+    def __init__(
+        self, 
+        pathOfEmotionImagesList = "./frame/emotionImagesList.txt",
+        wndWidth = 640,
+        wndHeight = 480):
         self.__emotionImages = {}       # 表情と表情に対応する画像を格納する辞書型リスト {(表情名,画像), ...}
-        emotionNames =                  # 表情名を一通り取得する        
-            Face.Face().result().keys() # 表情名が辞書型リストのキーになっている（と信じたい）
+        
+        # 表情名を一通り取得する
+        self.__emotionNames = face.Face().result().keys() # 表情名が辞書型リストのキーになっている（と信じたい）
 
         # 表情名と表情に対応する画像ファイルのパスが対で記述されたファイルを開く
-        emotionImagesListFile = open(pathOfEmotionImagesList, "r")
+        emotionImageListFile = open(pathOfEmotionImagesList, "r")
 
         # ファイルが開けない場合は強制終了
-        if not emotionImagesListFile.isOpen():
+        if not emotionImageListFile:
             print("\"" + pathOfEmotionImagesList + "\"の読み込みに失敗しました")
             exit()
 
-        for emotionName in emotionNames:
-
-
         pathListEmotionImages = {}      # 各表情に対応するフレーム画像各々のファイルパスを格納する辞書型リスト {(表情名, ファイルパス)}
+
+        while True:
+            line = emotionImageListFile.readline()
+            if not line:
+                break
+            line.strip("\n")
+            pair = line.split()
+            if len(pair) < 2:
+                continue
+            self.__emotionImages[pair[0]] = pygame.image.load("./frame/" + pair[1])
+            imgRect = self.__emotionImages[pair[0]].get_rect()
+            imgWidth = imgRect.width
+            imgHeight = imgRect.height
+            widthRate = float(wndWidth) / float(imgWidth)
+            heightRate = float(wndHeight) / float(imgHeight)
+            self.__emotionImages[pair[0]] = pygame.transform.scale(
+                    self.__emotionImages[pair[0]], (wndWidth, wndHeight)
+            )
+
+    def getEmotionImage(self, emotionName, w = 0, h = 0):
+        emotionImage = None            
+        if w == 0 or h == 0:
+            emotionImage = self.__emotionImages[emotionName]            
+        else:
+            emotionImage = pygame.transform.scale(
+                self.__emotionImages[emotionName],
+                (w,h)
+            )
+        return emotionImage
+
+
         
         

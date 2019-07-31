@@ -18,6 +18,7 @@ def faceDetectionDummy(img):
     aface = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(30, 30))
     facesData = faces.Faces(img)
     cnt = 0
+
     # 顔領域を赤色の矩形で囲む
     for (x, y, w, h) in aface:
         faceData = face.Face(cnt, [(x, y), (w, h)])
@@ -25,8 +26,4 @@ def faceDetectionDummy(img):
         faceData.__face__id = cnt
         facesData.set_face(faceData)
         cnt += 1
-        print(faceData.rect())
-        #print(str(faceData.x) + "," + str(faceData.y) + " ... " + str(w) + "x" + str(h))
-    #for f in faces:
-    #    print(str(f.x) + " " + str(f.y) + " " + str(f.width) + " " + str(f.id))
     return facesData
