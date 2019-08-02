@@ -2,8 +2,9 @@
 
 class SceneID:
     NONE                = 0
-    PROTOTYPE_SCENE    = 1
-    
+    START_SCENE         = 1
+    PROTOTYPE_SCENE     = 2
+    PLAY_GAME_SCENE     = 3
 
 class IScene(object):
     def __init__(self, window):

@@ -19,27 +19,44 @@ import Window
 import SceneEventID
 import FaceDetectionDummy
 import EmotionImages
+import VideoCapture
+
+# 構造体...pytho2に構造体ないのでclassで代用
+class SceneInfo:
+    def __init__(self, pathOfSceneInfoFile = "./init/scene.info"):
+        self.videoType                = None
+        self.drawLargeFrameFlag       = None
+        self.drawFaceFramesFlag       = None
+        self.drawDetectedRegionsFlag  = None
+
+        # 初期設定ファイルを開く
+        sceneInfoFile = open(pathOfSceneInfoFile, "r")
+
+        # 初期設定ファイルが開けない場合は即終了
+        if sceneInfoFile == None:
+            print(pathOfSceneInfoFile + "が開けませんでした")
+            exit()
+
+        self.videoType                = int((sceneInfoFile.readline()).rstrip("\n"))
+        self.drawLargeFrameFlag       = int((sceneInfoFile.readline()).rstrip("\n"))
+        self.drawFaceFramesFlag       = int((sceneInfoFile.readline()).rstrip("\n"))
+        self.drawDetectedRegionsFlag  = int((sceneInfoFile.readline()).rstrip("\n"))
 
 
 # シーンクラス
 # 画面内の処理を行う
 # （顔の検出やスコアの計算、カメラからの映像やフレームの描画、等）
 class PrototypeScene(IScene.IScene):
+
     # コンストラクタ
     def __init__(self, window):
         # メンバ変数の初期化 ---------------------------------------------------
         super(PrototypeScene, self).__init__(window)
         self.__sceneID = IScene.SceneID.PROTOTYPE_SCENE
 
-        self.__dirPathOfEmotionImages       = "./frame"                      # フレーム画像が存在するディレクトリのパス
         self.__pathOfemotionImageListFile   = "./frame/emotionImageList.txt" # 
         self.__pathInitSceneFile            = "./init/scene.info"
-        self.__clock = pygame.time.Clock()
         self.__emotionNames = []                # 表情の名称を格納するリスト
-        #self.__emotionImages = {}               # 表情の名称に対応する画像を格納する辞書型リスト
-
-        self.__captureImage          = None     # カメラからキャプチャーした画像
-        self.__captureImageForPygame = None     # カメラからキャプチャーした画像をpygame用に変換したもの
 
         self.__curlikelyEmotionName  = None     # 各顔の各表情スコアから求めた尤もらしい表情
         self.__maxScore              = -1       # 各顔の各表情スコアから求めた尤もらしい表情の合計スコア
@@ -48,24 +65,14 @@ class PrototypeScene(IScene.IScene):
         self.__isExitFlag = False               # シーン終了フラグをOFFにする
         self.__sceneEventId = SceneEventID.SceneEventID()    # シーンイベントを初期化する
         self.__initEmotionNames()               # 表情の名称を取得する
-        self.__window.setFontSize(20)           # フォントサイズを設定する
 
-        sceneInfo = open(self.__pathInitSceneFile , "r")
-        if sceneInfo == None:
-            print("./init/scene.infoが見つかりませんでした")
-        else:
-            cameraType = int((sceneInfo.readline()).rstrip("\n"))
-            # 引数： 0...内蔵カメラ　1...USB接続カメラ
-            self.__cameraCapture = cv2.VideoCapture(cameraType)  
-            if not self.__cameraCapture.isOpened():
-                print("カメラが接続されていません・・・")
-            else:
-                self.__readVideoCapture()
-            self.__isDrawLargeFrame = int((sceneInfo.readline()).rstrip("\n"))
-            self.__isDrawFaceFrames = int((sceneInfo.readline()).rstrip("\n"))
-            self.__isDrawDetectedRegions = int((sceneInfo.readline()).rstrip("\n"))
+        self.__sceneInfo = SceneInfo()
+        self.__videoCapture = VideoCapture.VideoCapture(window, self.__sceneInfo.videoType)
 
-        self.__faces = faces.Faces(self.__captureImage)                  # 顔リストクラスの初期化を行う
+        self.__readSceneInfoFile()              # シーンの初期設定が記述されたファイルを読み込む
+        
+        self.__faces = faces.Faces(self.__videoCapture.getCaptureImage())                  # 顔リストクラスの初期化を行う
+
         self.__emotionImagesObj = EmotionImages.EmotionImages(
             self.__pathOfemotionImageListFile,
             self.__window.getWidth(),
@@ -73,8 +80,10 @@ class PrototypeScene(IScene.IScene):
         )
 
 
+# 外部から呼び出されるメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # 更新処理のメインとなるメソッド
     def update(self):
+        self.__videoCapture.update()
         self.__eventCheck()         # シーンイベントを確認する
         self.__doEvent()            # シーンイベントを実行する
         return True
@@ -106,6 +115,10 @@ class PrototypeScene(IScene.IScene):
     def isExit(self):
         return self.__isExitFlag
 
+    # 次のシーンのIDを取得する
+    def getNextSceneID(self):
+        return IScene.SceneID.NONE
+
 
 # 初期化(__init__)関連のメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # 各表情の名称を格納したリストを取得するメソッド
@@ -116,6 +129,16 @@ class PrototypeScene(IScene.IScene):
         for emotionName in emotionScores.keys():
             self.__emotionNames.append(emotionName)
 
+    # シーンの初期設定が記述されたファイルを読み込む
+    def __readSceneInfoFile(self):
+        sceneInfo = open(self.__pathInitSceneFile , "r")
+        self.__initDrawFlags()
+
+    # 表示/非表示関連のフラグの初期設定を行う
+    def __initDrawFlags(self):
+        self.__isDrawLargeFrame         = self.__sceneInfo.drawLargeFrameFlag
+        self.__isDrawFaceFrames         = self.__sceneInfo.drawFaceFramesFlag
+        self.__isDrawDetectedRegions    = self.__sceneInfo.drawDetectedRegionsFlag
 
 
 # 描画(__draw)関連のメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
@@ -150,9 +173,8 @@ class PrototypeScene(IScene.IScene):
 
 
     # カメラから読み込んだ画像を描画するメソッド
-    def __drawCaptureImage(self):    
-        if self.__captureImageForPygame != None:
-            self.__window.drawImg(self.__captureImageForPygame, 0, 0)
+    def __drawCaptureImage(self):
+        self.__window.drawImg(self.__videoCapture.getCaptureImageForPygame(), 0, 0)
 
     
     # フレームを描画するメソッド
@@ -166,18 +188,6 @@ class PrototypeScene(IScene.IScene):
             )
         else:
             print("\"Face\" クラスに存在しない表情名" + "\"" + self.__curlikelyEmotionName + "\"が尤もらしい表情として指定されました．")
-
-    # カメラから映像１フレーム分を読み込むメソッド
-    def __readVideoCapture(self):
-        isSuccessed, captureImage = self.__cameraCapture.read()   
-        if isSuccessed:
-            self.__captureImage = captureImage                                              # まず、普通にOpenCVで使用可能な形式で読み込み、
-            self.__captureImageForPygame = Util.cvtOpenCVImgToPygame(self.__captureImage)   # これをpygameで使用可能な形式へと変換する
-        else:
-            print("failed to read video camera image...")
-            size = self.__window.getHeight(), self.__window.getWidth(), 3
-            contours = np.array( [ [0,0], [0,size[1]], [size[0], size[1]], [size[0],0] ] )
-            dummy = np.zeros(size, dtype=np.uint8)
 
 # 更新(__update)関連のメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # シーンの現在行うべきイベントを確認する
@@ -218,9 +228,6 @@ class PrototypeScene(IScene.IScene):
         for emotionName in emotionSumScores.keys():
             emotionSumScores[emotionName] = 0.0
 
-        # カメラから画像を取得する
-        self.__readVideoCapture()
-
         # 顔を検出する
         self.__faces = self.__detectFaces()
         
@@ -250,7 +257,7 @@ class PrototypeScene(IScene.IScene):
     # 実装は他の人が行うので担当外
     # 仮実装として顔の検出数や位置等は乱数
     def __detectFaces(self):
-        faces = FaceDetectionDummy.faceDetectionDummy(self.__captureImage)
+        faces = FaceDetectionDummy.faceDetectionDummy(self.__videoCapture.getCaptureImage())
         return faces
 
     # 検出された顔の表情スコアを求めるメソッド

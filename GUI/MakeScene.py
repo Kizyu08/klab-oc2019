@@ -4,7 +4,21 @@ import PrototypeScene
 import Window
 
 def makeScene(sceneID, window):
+    nextScene = None
+
     if sceneID == IScene.SceneID.PROTOTYPE_SCENE:
-        return PrototypeScene.PrototypeScene(window)
+        nextScene = PrototypeScene.PrototypeScene(window)
+
+    elif sceneID == IScene.SceneID.PLAY_GAME_SCENE:
+        print("未実装のシーンです")
+        nextScene = IScene.NoneScene(window)
+
+    elif sceneID == IScene.SceneID.START_SCENE:
+        print("未実装のシーンです")
+        nextScene = IScene.NoneScene(window)
+        
     else:
-        return IScene.NoneScene(window)
+        print("存在しないシーンのIDが渡されました")
+        nextScene = IScene.NoneScene(window)
+
+    return nextScene
