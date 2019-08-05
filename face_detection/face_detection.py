@@ -1,7 +1,8 @@
 import cv2
 #import Face
 
-def detectface(c_frame, window=False):
+
+def face_detection(c_frame, window=False):
     # 定数定義
     ORG_WINDOW_NAME = "org"
     GAUSSIAN_WINDOW_NAME = "gaussian"
@@ -55,7 +56,7 @@ if __name__ == '__main__':
 
     # 変換処理ループ
     while end_flag == True:
-        length, faces = detectface(frame, window=True)
+        length, faces = face_detection(frame, window=True)
         print(length)
         print(faces)
 
