@@ -5,6 +5,8 @@ import face
 import faces
 
 def face_detection(facesIn, window=False):
+    """画像を持ったfacesクラスをブチ込むとfaceを入れて返すクラス"""
+    """in:faces out:faces"""
     # 定数定義
     ORG_WINDOW_NAME = "org"
     GAUSSIAN_WINDOW_NAME = "gaussian"
