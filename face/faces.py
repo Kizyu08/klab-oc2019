@@ -16,6 +16,9 @@ class Faces:
     def image(self):
         return self.__image
 
+    def set_image(self, image):
+        self.__image = image
+
     def set_face(self, newface):
         self.__faces.append(newface)
 
