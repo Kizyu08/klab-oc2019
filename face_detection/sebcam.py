@@ -39,7 +39,7 @@ def detectface(c_frame, window=False):
     
     
 
-    return len(face_list), face_list 
+    return len(face_list), face_list
 
 if __name__ == '__main__':
     # 定数定義
