@@ -14,7 +14,6 @@ import IScene
 import Util
 import Window
 import SceneEventID
-import FaceDetectionDummy
 import EmotionImages
 import VideoCapture
 
@@ -24,6 +23,9 @@ import faces
 
 sys.path.append('../face_detection')
 import face_detection
+
+sys.path.append('../face_emotion')
+import ident
 
 
 # 構造体...pytho2に構造体ないのでclassで代用
@@ -271,26 +273,7 @@ class PrototypeScene(IScene.IScene):
     # 検出された顔の表情スコアを求めるメソッド
     # 実装は他の人が行うので担当外
     def __computeFaceScores(self, facesObj):
-        emotionNames = self.__emotionImages.getEmotionNames()
-        maxSizeFace = face.Face()
-        faceList = facesObj.face()
-        (x, y), (w, h) = maxSizeFace.rect()
-        for aface in faceList:
-            (cx, cy), (cw, ch) = aface.rect()
-            if cw > w:
-                w = cw
-        for aface in faceList:
-            (x, y), (w, h) = aface.rect()
-            cnt = 0
-            pos = int(w / 25) % len(emotionNames)
-            emotionScores = aface.result()
-            for emotionName in emotionScores.keys():
-                if cnt == pos:
-                    emotionScores[emotionName] = 1.0
-                else:
-                    emotionScores[emotionName] = 0
-                cnt += 1
-        return facesObj
+        return ident.emotion(facesObj)
 
     # 画面の内容を画像として保存する
     def __saveImage(self):

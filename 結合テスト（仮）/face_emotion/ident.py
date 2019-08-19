@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import sys
 sys.path.append('../face')
+
 from face import Face
 from faces import Faces
 import cv2
@@ -22,11 +25,11 @@ def emotion(data):
     cnn.to_gpu(0)
  
     
-   　facelist = data.faces()
+    facelist = data.faces()
     img = data.image()
     image_datas = []
-    
-    #画像の切り出し
+
+    # 画像の切り出し
     for i in range (len(facelist)):
         (x,y), (width,height)=facelist[i].rect()
         img_dist = img[x:width+x,y:height+y]
