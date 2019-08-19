@@ -22,7 +22,7 @@ def emotion(data):
     cnn.to_gpu(0)
  
     
-   　facelist = data.faces()
+    facelist = data.face()
     img = data.image()
     image_datas = []
     
@@ -49,7 +49,7 @@ def emotion(data):
     
     #スコアの書き出し
     for i in range (len(facelist)):
-        data.faces()[i].set_result(identification_output[i][0],identification_output[i][1],identification_output[i][2],identification_output[i][3],identification_output[i][4],identification_output[i][5],identification_output[i][6],identification_output[i][7],identification_output[i][8])
+        data.face()[i].set_result(identification_output[i][0],identification_output[i][1],identification_output[i][2],identification_output[i][3],identification_output[i][4],identification_output[i][5],identification_output[i][6],identification_output[i][7],identification_output[i][8])
     
     
     return data
