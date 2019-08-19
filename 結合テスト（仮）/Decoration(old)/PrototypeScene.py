@@ -99,6 +99,7 @@ class PrototypeScene(IScene.IScene):
     def update(self):
         self.__videoCapture.update()                                        # キャプチャーした画像を最新のものへ更新する
         self.__faces = faces.Faces(self.__videoCapture.getCaptureImage())   # Facesクラスを初期化する
+        self.__faces.set_image(self.__videoCapture.getCaptureImage())
         self.__eventCheck()                                                 # シーンイベントを確認する
         self.__doEvent()                                                    # シーンイベントを実行する
         return True
@@ -120,6 +121,7 @@ class PrototypeScene(IScene.IScene):
             self.__drawFrame()
 
         self.__window.reverseScreen()   # カメラからの映像は鏡合わせになるので左右反転させる
+        print("draw")
 
         return True
 
@@ -175,7 +177,11 @@ class PrototypeScene(IScene.IScene):
             frameImage = self.__emotionImages.getEmotionImage(likelyEmotionName, w, h)
             if frameImage:
                 self.__window.drawImg(frameImage, x, y)
-
+                self.__window.drawText(
+                    str(x) + ", " + str(y) + " : " + likelyEmotionName,
+                    x, y,
+                    50
+                )
 
     # カメラから読み込んだ画像を描画するメソッド
     def __drawCaptureImage(self):
@@ -237,6 +243,7 @@ class PrototypeScene(IScene.IScene):
         # 顔を検出する
         self.__faces = self.__detectFaces()
         
+        
         # 各顔の表情スコアを求める
         self.__faces = self.__computeFaceScores(self.__faces)
 
@@ -262,10 +269,10 @@ class PrototypeScene(IScene.IScene):
     # 仮実装として顔の検出数や位置等は乱数
     def __detectFaces(self):
         if len(self.__faces.image()) <= 0:
-            print("image is None")
+            print("__detectFaces : image is None")
             return self.__faces
         print("image captured")
-        return face_detection.face_detection( self.__faces)
+        return face_detection.face_detection(self.__faces)
         
         #faces = FaceDetectionDummy.faceDetectionDummy(self.__videoCapture.getCaptureImage())
         #return faces
@@ -273,6 +280,9 @@ class PrototypeScene(IScene.IScene):
     # 検出された顔の表情スコアを求めるメソッド
     # 実装は他の人が行うので担当外
     def __computeFaceScores(self, facesObj):
+        if len(facesObj.face()) <= 0:
+            return facesObj
+        #cv2.imwrite("testtesttest.png", facesObj.image())
         return ident.emotion(facesObj)
 
     # 画面の内容を画像として保存する

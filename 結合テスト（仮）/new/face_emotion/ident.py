@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+
 import sys
 sys.path.append('../face')
+
 from face import Face
 from faces import Faces
 import cv2
@@ -26,7 +28,7 @@ def emotion(data):
     facelist = data.face()
     img = data.image()
     image_datas = []
-    
+
     # 画像の切り出し
     for i in range (len(facelist)):
         (x,y), (width,height)=facelist[i].rect()
@@ -55,3 +57,15 @@ def emotion(data):
     
     return data
 
+
+def main():
+	unkoface=Face(1,[(0,0),(40,40)])
+	img=cv2.imread("lena.jpeg")
+	aaa=Faces(img)
+	aaa.set_face(unkoface)
+
+	aaa=emotion(aaa)
+	faces=aaa.face()
+	print(str(faces[0].result()))
+
+main()

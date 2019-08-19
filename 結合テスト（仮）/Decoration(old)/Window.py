@@ -97,7 +97,8 @@ class Window:
 
 	# 画像をウィンドウへ表示する
 	def drawImg(self, img, x, y):
-		self.__screen.blit(img,(x, y))
+		if img != None:
+			self.__screen.blit(img,(x, y))
 	
 	# 矩形を描画する
 	# rgb   : 矩形の色(RGB)
