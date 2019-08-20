@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <title>Result</title>
+</head>
+<body>
+<div class="container">
+    <div style="padding-top: 20px"></div>
+
+    <!--<h1 th:text="|${id}|"></h1>-->
+
+    <div class="card border-primary mb-3" th:each="face : ${faces.results}">
+        <div class="card-body">
+            <!--<p th:text="${face.picture_id}"></p>-->
+            <!--<p th:text="${face.position}"></p>-->
+            <p th:text="|Score: ${face.score}|"></p>
+            <p th:style="|position:relative; width: ${face.position.x2 - face.position.x1}px; height: ${face.position.y2 - face.position.y1}px; overflow: hidden;|">
+                <img width="1000" th:src="${picture.decorated}" th:style="|position:relative; top: -${face.position.y1}px; left: -${face.position.x1}px|">
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/js/jquery-3.4.1.min.js" th:src="@{/js/jquery-3.4.1.min.js}"></script>
+<script src="/js/popper.min.js" th:src="@{/js/popper.min.js}"></script>
+<script src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+</html>

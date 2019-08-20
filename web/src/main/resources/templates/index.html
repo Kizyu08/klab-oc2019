@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <title>Facial Performance</title>
+</head>
+<body>
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary" style="">
+        <div class="container">
+            <a href="./" target="_top" class="navbar-brand">Facial Performance</a>
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse" id="navbarResponsive" style="">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./ranking/" target="_top">Ranking</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: absolute; top: 58px; left: 0; right: 0; bottom: 0; height: 100%">
+        <iframe name="frame1" sandbox="allow-same-origin allow-forms allow-scripts allow-modals" src="camera" style="width: 100%; height: 100%; border: none; padding: 0; margin: 0" frameborder="0"></iframe>
+    </div>
+
+    </body>
+    <script th:src="@{/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/popper.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
+</html>
