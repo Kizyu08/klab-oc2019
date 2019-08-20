@@ -1,8 +1,0 @@
-digraph "classes" {
-charset="utf-8"
-rankdir=BT
-"0" [label="{IScene|\l|draw()\lgetNextSceneID()\lisExit()\lisRunning()\lupdate()\l}", shape="record"];
-"1" [label="{NoneScene|\l|}", shape="record"];
-"2" [label="{SceneID|NONE : int\lPLAY_GAME_SCENE : int\lPROTOTYPE_SCENE : int\lSTART_SCENE : int\l|}", shape="record"];
-"1" -> "0" [arrowhead="empty", arrowtail="none"];
-}

@@ -14,7 +14,7 @@ import IScene
 import Util
 import Window
 import SceneEventID
-import EmotionImages
+#import EmotionImages
 import VideoCapture
 
 sys.path.append('../face')
@@ -27,6 +27,9 @@ import face_detection
 sys.path.append('../face_emotion')
 import ident
 
+sys.path.append('../Decoration')
+import Decoration
+import EmotionImages
 
 # 構造体...pytho2に構造体ないのでclassで代用
 class SceneInfo:
@@ -93,6 +96,12 @@ class PrototypeScene(IScene.IScene):
             self.__window.getHeight()
         )
 
+        # 装飾クラスの初期化
+        self.__decorator = Decoration.Decoration(
+            self.__window.getWidth(),
+            self.__window.getHeight()
+        )
+
 
 # 外部から呼び出されるメソッド ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     # 更新処理のメインとなるメソッド
@@ -106,23 +115,34 @@ class PrototypeScene(IScene.IScene):
 
     # 描画処理のメインとなるメソッド
     def draw(self):
-        self.__drawCaptureImage()       # カメラからの画像を描画する
+        #print("::::::::::::::::::draw first ::::::::::::::::::")
+        #print(type(self.__faces.image()))
+        #print("::::::::::::::::::draw 2 ::::::::::::::::::")
+        #self.__drawCaptureImage()       # カメラからの画像を描画する
 
         # 各顔を表情スコアが最大となる表情のフレームで囲うようにフレームを描画する
-        if self.__isDrawFaceFrames:
-            self.__drawFrameByFaces()       
+        #if self.__isDrawFaceFrames:
+        #    self.__drawFrameByFaces()       
         
         # 各顔の検出位置を示す矩形を表示する
-        if self.__isDrawDetectedRegions:
-            self.__drawDetectedRegions()
+        #if self.__isDrawDetectedRegions:
+        #    self.__drawDetectedRegions()
 
         # 画面全体を覆うフレームを描画する
-        if self.__isDrawLargeFrame:
-            self.__drawFrame()
+        #if self.__isDrawLargeFrame:
+        #    self.__drawFrame()
 
+        self.__decorator.decorate(self.__faces)
+        img = self.__faces.image()
+        imgPgm = Util.cvtOpenCVImgToPygame(img)
+        
+        self.__window.drawImg(
+            imgPgm,
+            0, 0
+        )
         #self.__window.reverseScreen()   # カメラからの映像は鏡合わせになるので左右反転させる
-        print("draw")
-
+        #print("draw")
+        #print("::::::::::::::::::draw end ::::::::::::::::::")
         return True
 
     # シーンが終了状態かどうか取得する
@@ -271,7 +291,7 @@ class PrototypeScene(IScene.IScene):
         if len(self.__faces.image()) <= 0:
             print("__detectFaces : image is None")
             return self.__faces
-        print("image captured")
+        #print("image captured")
         return face_detection.face_detection(self.__faces)
         
         #faces = FaceDetectionDummy.faceDetectionDummy(self.__videoCapture.getCaptureImage())
@@ -285,12 +305,12 @@ class PrototypeScene(IScene.IScene):
             print("people : 0")
             return facesObj
         size = facesObj.image().shape[:2]
-        print(size)
+        #print(size)
         if size <= 0:
-            print("None image")
+            print("None capure image")
             return facesObj
 
-        print("people : 1 ijo")
+        #print("people : 1 ijo")
         
         #cv2.imwrite("testtesttest.png", facesObj.image())
         return ident.emotion(facesObj)

@@ -18,6 +18,8 @@ import Util
 import Window
 import SceneEventID
 import FaceDetectionDummy
+#import EmotionImages
+sys.path.append('../Decoration')
 import EmotionImages
 
 VIDEO_TYPE_DEFALT = 0
@@ -59,6 +61,9 @@ class VideoCapture:
 
     # 読み込んだ画像を取得する(OpenCV形式)
     def getCaptureImage(self):
+        print("[debug] ******************: getCaptureImage :************************")
+        print(type(self.__captureImage))
+        print("[debug] ******************: getCaptureImage :************************ end")
         return self.__captureImage
 
     # 読み込んだ画像を取得する(pygame形式)
