@@ -17,7 +17,7 @@ import IScene
 import Util
 import Window
 import SceneEventID
-import FaceDetectionDummy
+#import FaceDetectionDummy
 #import EmotionImages
 sys.path.append('../Decoration')
 import EmotionImages
