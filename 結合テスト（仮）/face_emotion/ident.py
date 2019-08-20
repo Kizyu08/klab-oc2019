@@ -27,12 +27,28 @@ def emotion(data):
     img = data.image()
     image_datas = []
     
+    cv2.imwrite("cap_img.png", img)
+    img = cv2.imread('cap_img.png')
+
+    capH, capW = img.shape[:2]
+
+
     # 画像の切り出し
     for i in range (len(facelist)):
         (x,y), (width,height)=facelist[i].rect()
-        img_dist = img[x:width+x,y:height+y]
+        print("x,y = " + str(x) + ", " + str(y))
+        print("wid,hei = " + str(width) + ", " + str(height))
+        right=(x+width)
+        btm  = (y+height)
+        #img_dist = img[x:right,y:btm]
+        img_dist = img[y:btm, x:right]
+        #img_dist = img[capW - x:capW - width+x,capH - y:capH - height+y]
+        #img_dist = img[x:(x-width),y:(y-height)]
         image_datas.append(img_dist)
-    
+        height, width = img_dist.shape[:2]
+        print("Rect size = " + str(width) + " x " + str(height))
+        cv2.imwrite("img_dist.png",img_dist)
+		
     
     identification_image_datas = []
     size = (input_image_size[0], input_image_size[1])

@@ -99,7 +99,7 @@ class PrototypeScene(IScene.IScene):
     def update(self):
         self.__videoCapture.update()                                        # キャプチャーした画像を最新のものへ更新する
         self.__faces = faces.Faces(self.__videoCapture.getCaptureImage())   # Facesクラスを初期化する
-        self.__faces.set_image(self.__videoCapture.getCaptureImage())
+        #self.__faces.set_image(self.__videoCapture.getCaptureImage())
         self.__eventCheck()                                                 # シーンイベントを確認する
         self.__doEvent()                                                    # シーンイベントを実行する
         return True
@@ -120,7 +120,7 @@ class PrototypeScene(IScene.IScene):
         if self.__isDrawLargeFrame:
             self.__drawFrame()
 
-        self.__window.reverseScreen()   # カメラからの映像は鏡合わせになるので左右反転させる
+        #self.__window.reverseScreen()   # カメラからの映像は鏡合わせになるので左右反転させる
         print("draw")
 
         return True
@@ -280,8 +280,18 @@ class PrototypeScene(IScene.IScene):
     # 検出された顔の表情スコアを求めるメソッド
     # 実装は他の人が行うので担当外
     def __computeFaceScores(self, facesObj):
+        print(str(facesObj.face()))
         if len(facesObj.face()) <= 0:
+            print("people : 0")
             return facesObj
+        size = facesObj.image().shape[:2]
+        print(size)
+        if size <= 0:
+            print("None image")
+            return facesObj
+
+        print("people : 1 ijo")
+        
         #cv2.imwrite("testtesttest.png", facesObj.image())
         return ident.emotion(facesObj)
 

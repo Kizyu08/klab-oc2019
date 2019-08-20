@@ -54,7 +54,8 @@ class VideoCapture:
             print("failed to read video camera image...")
             size = self.__window.getHeight(), self.__window.getWidth(), 3
             contours = np.array( [ [0,0], [0,size[1]], [size[0], size[1]], [size[0],0] ] )
-            dummy = np.zeros(size, dtype=np.uint8)
+            #dummy = np.zeros(size, dtype=np.uint8)
+            dummy = None
 
     # 読み込んだ画像を取得する(OpenCV形式)
     def getCaptureImage(self):
