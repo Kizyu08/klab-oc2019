@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import cv2
 import sys
 sys.path.append('../face')
@@ -41,11 +43,7 @@ def face_detection(facesIn, window=False):
         cv2.imshow(ORG_WINDOW_NAME, img)
         cv2.imshow(GAUSSIAN_WINDOW_NAME, img_gray)
 
-<<<<<<< HEAD:face_detection/face_detection.py
     return facesIn
-=======
-    return len(face_list), face_list
->>>>>>> origin/Decoration:face_detection/sebcam.py
 
 if __name__ == '__main__':
     # 定数定義
