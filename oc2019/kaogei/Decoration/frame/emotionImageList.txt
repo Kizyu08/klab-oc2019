@@ -1,0 +1,9 @@
+neutral d.png
+happiness a.png
+surprise f.png
+sadness e.png
+anger f.png
+disgust b.png
+fear h.png
+contempt c.png
+unknown g.png
