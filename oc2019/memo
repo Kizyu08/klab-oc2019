@@ -1,0 +1,26 @@
+[準備]
+    django-admin startproject
+
+[サーバー稼働]
+    (1) python2 manage.py runserver
+    (2) ブラウザ開いて http://127.0.0.1:8000 へアクセス
+    (3) It worked 的な感じの文字列いろいろ出ればOK
+
+[データベース作成]
+
+
+[Error対応]
+    ・Error: That port is already in use.
+        → 次のコマンドでキルすればOK(ポートが8000の場合の例)
+            sudo lsof -t -i tcp:8000 | xargs kill -9
+
+
+
+
+
+[free]
+
+{
+	"origin": "base64された画像",
+	"decorated": "base64された画像"
+}
